@@ -25,6 +25,7 @@ import {
   SearchIcon,
   Logo,
 } from "@/components/icons";
+import NavLink from "./NavLink";
 
 export const Navbar = () => {
   const searchInput = (
@@ -50,9 +51,15 @@ export const Navbar = () => {
 
   return (
     <NextUINavbar
-      className="flex items-center bg-gradient-to-r from-sky-400 to-sky-800"
+      className="flex items-center bg-gradient-to-r from-secondary-500 to-secondary-700"
       classNames={{
-        item: ["font-medium", "uppercase", "font-semibold"],
+        item: [
+          "font-medium",
+          "uppercase",
+          "font-semibold",
+          "text-white",
+          "data-[active=true]:text-yellow-200",
+        ],
       }}
       maxWidth="xl"
       position="sticky"
@@ -72,18 +79,7 @@ export const Navbar = () => {
       <NavbarContent className="sm:flex basis-1 pl-4" justify="end">
         <ul className="hidden lg:flex gap-4 justify-start ml-2">
           {siteConfig.navItems.map((item) => (
-            <NavbarItem key={item.href}>
-              <NextLink
-                className={clsx(
-                  linkStyles({ color: "foreground" }),
-                  "data-[active=true]:text-primary data-[active=true]:font-xl"
-                )}
-                color="foreground"
-                href={item.href}
-              >
-                {item.label}
-              </NextLink>
-            </NavbarItem>
+            <NavLink key={item.href} item={item} />
           ))}
         </ul>
 
