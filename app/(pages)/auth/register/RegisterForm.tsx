@@ -8,10 +8,15 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { RegisterSchema } from "@/lib/schema";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
+import { registerUser } from "@/app/actions/authActions";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const RegisterForm = () => {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const [showPass, setShowPass] = useState(false);
   const {
     register,
@@ -29,6 +34,20 @@ const RegisterForm = () => {
 
   const onSubmit = (data: z.infer<typeof RegisterSchema>) => {
     console.log(data);
+    startTransition(() => {
+      registerUser(data)
+        .then((res) => {
+          if (res.success) {
+            router.push("/auth/login");
+            return toast.success(res.message);
+          } else {
+            return toast.error(res.error);
+          }
+        })
+        .catch((err) => {
+          return toast.error(err.message);
+        });
+    });
   };
 
   return (
@@ -111,8 +130,9 @@ const RegisterForm = () => {
 
             <Button
               fullWidth
+              isLoading={isPending}
               color="secondary"
-              isDisabled={!isValid}
+              isDisabled={!isValid || isPending}
               type="submit"
             >
               Register
