@@ -1,104 +1,37 @@
+import React from "react";
 import {
   Navbar as NextUINavbar,
-  NavbarContent,
-  NavbarMenu,
-  NavbarMenuToggle,
   NavbarBrand,
-  NavbarItem,
-  NavbarMenuItem,
-} from "@nextui-org/navbar";
-import { Button } from "@nextui-org/button";
-import { Kbd } from "@nextui-org/kbd";
-import { Link } from "@nextui-org/link";
-import { Input } from "@nextui-org/input";
-import { link as linkStyles } from "@nextui-org/theme";
-import NextLink from "next/link";
-import clsx from "clsx";
-
+  NavbarContent,
+  Link,
+} from "@nextui-org/react";
+import { Logo } from "@/components/icons";
+import AuthButton from "./AuthButton";
 import { siteConfig } from "@/config/site";
-import { ThemeSwitch } from "@/components/theme-switch";
-import {
-  TwitterIcon,
-  GithubIcon,
-  DiscordIcon,
-  HeartFilledIcon,
-  SearchIcon,
-  Logo,
-} from "@/components/icons";
 import NavLink from "./NavLink";
 
 export const Navbar = () => {
-  const searchInput = (
-    <Input
-      aria-label="Search"
-      classNames={{
-        inputWrapper: "bg-default-100",
-        input: "text-sm",
-      }}
-      endContent={
-        <Kbd className="hidden lg:inline-block" keys={["command"]}>
-          K
-        </Kbd>
-      }
-      labelPlacement="outside"
-      placeholder="Search..."
-      startContent={
-        <SearchIcon className="text-base text-default-400 pointer-events-none flex-shrink-0" />
-      }
-      type="search"
-    />
-  );
-
   return (
     <NextUINavbar
-      className="flex items-center bg-gradient-to-r from-secondary-500 to-secondary-700"
+      className="flex items-center"
       classNames={{
-        item: [
-          "font-medium",
-          "uppercase",
-          "font-semibold",
-          "text-white",
-          "data-[active=true]:text-yellow-200",
-        ],
+        item: ["text-lg", "data-[active=true]:text-secondary"],
       }}
-      maxWidth="xl"
-      position="sticky"
     >
-      <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
-        <NavbarBrand as="li" className="gap-3 max-w-fit">
-          <NextLink className="flex justify-start items-center gap-1" href="/">
-            <Logo />
-            <div className="font-bold text-3xl flex">
-              <span>Next</span>
-              <span className="text-slate-200">Match</span>
-            </div>
-          </NextLink>
-        </NavbarBrand>
+      <NavbarBrand as={Link} href="/" className="text-slate-800">
+        <Logo />
+        <p className="font-bold text-inherit text-xl">ACME</p>
+      </NavbarBrand>
+
+      <NavbarContent className="hidden sm:flex gap-4" justify="end">
+        {siteConfig.navItems.map((item) => (
+          <NavLink item={item} />
+        ))}
       </NavbarContent>
 
-      <NavbarContent className="sm:flex basis-1 pl-4" justify="end">
-        <ul className="hidden lg:flex gap-4 justify-start ml-2">
-          {siteConfig.navItems.map((item) => (
-            <NavLink key={item.href} item={item} />
-          ))}
-        </ul>
-
-        <ThemeSwitch className="text-slate-800" />
-        <NavbarMenuToggle className="flex md:hidden" />
+      <NavbarContent as="div" justify="end" className="p-0">
+        <AuthButton />
       </NavbarContent>
-
-      <NavbarMenu>
-        {searchInput}
-        <div className="mx-4 mt-2 flex flex-col gap-2">
-          {siteConfig.navMenuItems.map((item, index) => (
-            <NavbarMenuItem key={`${item}-${index}`}>
-              <Link href="#" size="lg">
-                {item.label}
-              </Link>
-            </NavbarMenuItem>
-          ))}
-        </div>
-      </NavbarMenu>
     </NextUINavbar>
   );
 };

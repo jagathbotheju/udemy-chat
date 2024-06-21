@@ -8,10 +8,15 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginSchema } from "@/lib/schema";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
+import { loginCredentials } from "@/app/actions/authActions";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const LoginForm = () => {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const [showPass, setShowPass] = useState(false);
 
   const {
@@ -29,10 +34,24 @@ const LoginForm = () => {
 
   const onSubmit = (data: z.infer<typeof LoginSchema>) => {
     console.log(data);
+    startTransition(() => {
+      loginCredentials(data)
+        .then((res) => {
+          if (res.success) {
+            router.push("/");
+            return toast.success(res.message);
+          } else {
+            return toast.error(res.error);
+          }
+        })
+        .catch((err) => {
+          return toast.error("Internal Server Error, please try again later");
+        });
+    });
   };
 
   return (
-    <Card className="w-2/5 mx-auto p-5">
+    <Card className="w-full md:w-2/5 mx-auto p-5">
       <CardHeader className="flex flex-col items-center justify-center">
         <div className="flex flex-col gap-2 items-center text-secondary">
           <div className="flex flex-row items-center gap-3">
@@ -79,6 +98,7 @@ const LoginForm = () => {
 
             <Button
               fullWidth
+              isLoading={isPending}
               color="secondary"
               isDisabled={!isValid}
               type="submit"

@@ -1,8 +1,55 @@
 "use server";
-import { RegisterSchema } from "@/lib/schema";
+import { LoginSchema, RegisterSchema } from "@/lib/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import prisma from "@/lib/prisma";
+import { signIn, signOut } from "@/config/auth";
+import { AuthError } from "next-auth";
+
+export const logout = async () => {
+  await signOut();
+};
+
+export const loginCredentials = async (data: z.infer<typeof LoginSchema>) => {
+  try {
+    const result = await signIn("credentials", {
+      email: data.email,
+      password: data.password,
+      redirect: false,
+    });
+
+    console.log("loginUser - credentials", result);
+    return {
+      success: true,
+      message: "Successfully Logged In",
+    };
+  } catch (error) {
+    console.log("loginCredentials Error -server", error);
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case "CredentialsSignin":
+          return {
+            success: false,
+            error: "Invalid Credentials",
+          };
+        default:
+          return {
+            success: false,
+            error: "Something get wrong, please try again later",
+          };
+      }
+    } else {
+      return {
+        success: false,
+        error: "Something get wrong, please try again later",
+      };
+    }
+    // return {
+    //   success: false,
+    //   error: "Internal Server Error, login user",
+    // };
+  }
+};
 
 export const registerUser = async (data: z.infer<typeof RegisterSchema>) => {
   try {

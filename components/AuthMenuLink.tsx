@@ -8,18 +8,20 @@ interface Props {
     label: string;
     href: string;
   };
+  setIsOpen: (open: boolean) => void;
 }
 
-const NavLink = ({ item }: Props) => {
+const AuthMenuLink = ({ item, setIsOpen }: Props) => {
   const pathname = usePathname();
 
   return (
     <NavbarItem
+      onClick={() => setIsOpen(false)}
       as={Link}
       isActive={item.href === pathname}
       href={item.href}
       className={cn(
-        "text-left w-full rounded-xl font-semibold cursor-pointer px-3 py-1 text-slate-800"
+        "text-left w-full rounded-xl font-semibold cursor-pointer px-3 py-1 text-slate-800 hover:bg-slate-100"
       )}
     >
       {item.label}
@@ -27,4 +29,4 @@ const NavLink = ({ item }: Props) => {
   );
 };
 
-export default NavLink;
+export default AuthMenuLink;
