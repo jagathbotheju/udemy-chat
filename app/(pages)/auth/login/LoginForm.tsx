@@ -39,6 +39,7 @@ const LoginForm = () => {
         .then((res) => {
           if (res.success) {
             router.push("/");
+            router.refresh();
             return toast.success(res.message);
           } else {
             return toast.error(res.error);

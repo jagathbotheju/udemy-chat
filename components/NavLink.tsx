@@ -16,7 +16,7 @@ const NavLink = ({ item }: Props) => {
   return (
     <NavbarItem
       as={Link}
-      isActive={item.href === pathname}
+      isActive={pathname.startsWith(item.href)}
       href={item.href}
       className={cn(
         "text-left w-full rounded-xl font-semibold cursor-pointer px-3 py-1 text-slate-800"
