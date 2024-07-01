@@ -5,11 +5,12 @@ import { User } from "@prisma/client";
 import { redirect } from "next/navigation";
 import _ from "lodash";
 import MemberCard from "./MemberCard";
+import { getCurrentUserLikeIds } from "@/app/actions/likeActions";
 
 export default async function MembersPage() {
   const session = await auth();
   const user = session?.user as User;
-  if (!user) redirect("/auth/login");
+  if (!user) redirect("/auth/login?callbackUrl=/members");
 
   const members = await prisma.member.findMany({
     where: {
@@ -18,6 +19,8 @@ export default async function MembersPage() {
       },
     },
   });
+  const res = await getCurrentUserLikeIds();
+  const likeIds = res.likeIds;
 
   if (_.isEmpty(members))
     return (
@@ -26,10 +29,12 @@ export default async function MembersPage() {
       </h1>
     );
 
+  console.log("MembersPage", user);
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 w-fit">
       {members.map((member) => (
-        <MemberCard member={member} key={member.id} />
+        <MemberCard member={member} key={member.id} likeIds={likeIds} />
       ))}
     </div>
   );

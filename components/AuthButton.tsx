@@ -8,8 +8,6 @@ const AuthButton = async () => {
   const session = await auth();
   const user = session?.user as User;
 
-  console.log("AuthButton", user);
-
   return (
     <div className="items-center gap-2 flex">
       {user ? (

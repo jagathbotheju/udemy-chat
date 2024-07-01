@@ -7,7 +7,7 @@ export default async function PricingPage() {
   const session = await auth();
   const user = session?.user as User;
 
-  if (!user) redirect("/auth/login");
+  if (!user) redirect("/auth/login?callbackUrl=/messages");
 
   return (
     <div>

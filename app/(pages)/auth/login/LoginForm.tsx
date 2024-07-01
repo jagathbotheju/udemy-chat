@@ -14,7 +14,11 @@ import { loginCredentials } from "@/app/actions/authActions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-const LoginForm = () => {
+interface Props {
+  callbackUrl?: string;
+}
+
+const LoginForm = ({ callbackUrl }: Props) => {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [showPass, setShowPass] = useState(false);
@@ -38,7 +42,7 @@ const LoginForm = () => {
       loginCredentials(data)
         .then((res) => {
           if (res.success) {
-            router.push("/");
+            router.push(callbackUrl ? callbackUrl : "/");
             router.refresh();
             return toast.success(res.message);
           } else {
@@ -46,10 +50,13 @@ const LoginForm = () => {
           }
         })
         .catch((err) => {
-          return toast.error("Internal Server Error, please try again later");
+          console.log("LoginForm", err);
+          return toast.error("Invalid Credentials");
         });
     });
   };
+
+  console.log("LoginForm", callbackUrl);
 
   return (
     <Card className="w-full md:w-2/5 mx-auto p-5">

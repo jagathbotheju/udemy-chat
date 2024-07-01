@@ -3,7 +3,7 @@ import { LoginSchema, RegisterSchema } from "@/lib/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import prisma from "@/lib/prisma";
-import { signIn, signOut } from "@/config/auth";
+import { auth, signIn, signOut } from "@/config/auth";
 import { AuthError } from "next-auth";
 
 export const logout = async () => {
@@ -28,6 +28,7 @@ export const loginCredentials = async (data: z.infer<typeof LoginSchema>) => {
     if (error instanceof AuthError) {
       switch (error.type) {
         case "CredentialsSignin":
+          console.log("CredentialsSignin error");
           return {
             success: false,
             error: "Invalid Credentials",
@@ -41,7 +42,7 @@ export const loginCredentials = async (data: z.infer<typeof LoginSchema>) => {
     } else {
       return {
         success: false,
-        error: "Something get wrong, please try again later",
+        error: "Invalid Credentials",
       };
     }
     // return {

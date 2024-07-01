@@ -1,9 +1,15 @@
 import LoginForm from "./LoginForm";
 
-const LoginPage = () => {
+interface Props {
+  searchParams: {
+    callbackUrl?: string;
+  };
+}
+
+const LoginPage = ({ searchParams }: Props) => {
   return (
     <div className="flex items-center justify-center h-full">
-      <LoginForm />
+      <LoginForm callbackUrl={searchParams.callbackUrl} />
     </div>
   );
 };

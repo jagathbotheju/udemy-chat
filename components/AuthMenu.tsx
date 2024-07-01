@@ -33,7 +33,7 @@ const AuthMenu = ({ user }: Props) => {
           as="button"
           name={user.name ?? "guest"}
           description={user.email}
-          className="transition-transform"
+          // className="transition-transform"
           avatarProps={{
             src: user?.image ?? "",
             fallback: (
