@@ -6,10 +6,41 @@ import prisma from "@/lib/prisma";
 import { auth, signIn, signOut } from "@/config/auth";
 import { AuthError } from "next-auth";
 
+/************GET USER BY ID******************************************************* */
+export const getUserById = async (id: string) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (user) {
+      return {
+        success: true,
+        data: user,
+      };
+    }
+
+    return {
+      success: false,
+      error: "Unable to get user by id",
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      error: "Internal Server Error,getting user by id",
+    };
+  }
+};
+
+/************LOGOUT************************************************************** */
 export const logout = async () => {
   await signOut();
 };
 
+/************LOGIN CREDENTIALS************************************************** */
 export const loginCredentials = async (data: z.infer<typeof LoginSchema>) => {
   try {
     const result = await signIn("credentials", {
@@ -52,6 +83,7 @@ export const loginCredentials = async (data: z.infer<typeof LoginSchema>) => {
   }
 };
 
+/************REGISTER USER************************************************** */
 export const registerUser = async (data: z.infer<typeof RegisterSchema>) => {
   try {
     const validatedData = RegisterSchema.safeParse(data);

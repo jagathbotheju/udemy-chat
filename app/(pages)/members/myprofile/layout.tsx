@@ -1,18 +1,27 @@
 import prisma from "@/lib/prisma";
 import MemberSidebar from "../MemberSidebar";
 import { Card } from "@nextui-org/card";
+import { auth } from "@/config/auth";
+import { redirect } from "next/navigation";
 
 interface Props {
-  params: {
-    id: string;
-  };
   children: React.ReactNode;
 }
 
-const Layout = async ({ params, children }: Props) => {
+const Layout = async ({ children }: Props) => {
+  const basePath = `/members/myprofile`;
+  const navLinks = [
+    { name: "Profile", href: `${basePath}` },
+    { name: "Photos", href: `${basePath}/photos` },
+  ];
+  const session = await auth();
+  const user = session?.user;
+
+  if (!user) redirect("/auth/login");
+
   const member = await prisma.member.findUnique({
     where: {
-      userId: params.id,
+      userId: user.id,
     },
   });
 
@@ -22,13 +31,6 @@ const Layout = async ({ params, children }: Props) => {
         Member Details not Found
       </h1>
     );
-
-  const basePath = `/members/${member.userId}`;
-  const navLinks = [
-    { name: "Profile", href: `${basePath}` },
-    { name: "Photos", href: `${basePath}/photos` },
-    { name: "Chat", href: `${basePath}/chat` },
-  ];
 
   return (
     <div className="grid grid-cols-12 gap-5 h-[80vh]">

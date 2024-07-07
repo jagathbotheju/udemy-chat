@@ -3,10 +3,17 @@ import { User } from "@prisma/client";
 import { Button } from "@nextui-org/react";
 import AuthMenu from "./AuthMenu";
 import Link from "next/link";
+import { getUserById } from "@/app/actions/authActions";
 
 const AuthButton = async () => {
   const session = await auth();
-  const user = session?.user as User;
+  let user = session?.user as User;
+
+  if (user) {
+    const res = await getUserById(user.id);
+    const userDB = res.data as User;
+    user = userDB;
+  }
 
   return (
     <div className="items-center gap-2 flex">

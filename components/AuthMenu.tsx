@@ -9,10 +9,11 @@ import {
   NavbarItem,
 } from "@nextui-org/react";
 import NavLink from "./NavLink";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { User } from "@prisma/client";
-import { logout } from "@/app/actions/authActions";
+import { getUserById, logout } from "@/app/actions/authActions";
 import AuthMenuLink from "./AuthMenuLink";
+import { useSession } from "next-auth/react";
 
 interface Props {
   user: User;
@@ -44,6 +45,13 @@ const AuthMenu = ({ user }: Props) => {
       </PopoverTrigger>
       <PopoverContent className="w-[150px] p-0">
         <div className="flex flex-col w-full gap-1">
+          <AuthMenuLink
+            setIsOpen={setIsOpen}
+            item={{
+              href: `/members/myprofile`,
+              label: "My Profile",
+            }}
+          />
           <div className="flex flex-col gap-1">
             {siteConfig.navItems.map((item) => (
               <AuthMenuLink key={item.href} item={item} setIsOpen={setIsOpen} />

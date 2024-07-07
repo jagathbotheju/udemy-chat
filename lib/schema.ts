@@ -1,5 +1,12 @@
 import { z } from "zod";
 
+export const MemberEditSchema = z.object({
+  name: z.string().min(1, "name is required"),
+  description: z.string().min(1, "description is required"),
+  city: z.string().min(1, "city is required"),
+  country: z.string().min(1, "country is required"),
+});
+
 export const LoginSchema = z.object({
   email: z
     .string()

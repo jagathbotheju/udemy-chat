@@ -1,5 +1,8 @@
 import prisma from "@/lib/prisma";
 import { CardBody, CardHeader, Divider } from "@nextui-org/react";
+import MemberProfile from "./MemberProfile";
+import { auth } from "@/config/auth";
+import { User } from "@prisma/client";
 
 interface Props {
   params: {
@@ -8,6 +11,8 @@ interface Props {
 }
 
 const MemberDetailPage = async ({ params }: Props) => {
+  const session = await auth();
+  const user = session?.user as User;
   const member = await prisma.member.findUnique({
     where: {
       userId: params.id,
@@ -21,15 +26,7 @@ const MemberDetailPage = async ({ params }: Props) => {
       </h1>
     );
 
-  return (
-    <>
-      <CardHeader className="text-2xl font-semibold text-secondary">
-        Profile
-      </CardHeader>
-      <Divider />
-      <CardBody>{member.description}</CardBody>
-    </>
-  );
+  return <MemberProfile member={member} currentUser={user} />;
 };
 
 export default MemberDetailPage;
