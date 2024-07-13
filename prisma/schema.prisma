@@ -43,6 +43,24 @@ model Member {
 
   sourceLikes Like[] @relation("source")
   targetLikes Like[] @relation("target")
+
+  senderMessages   Message[] @relation("sender")
+  receiverMessages Message[] @relation("receiver")
+}
+
+model Message {
+  id              String    @id @default(cuid())
+  text            String
+  createdAt       DateTime  @default(now())
+  dateRead        DateTime?
+  senderDeleted   Boolean   @default(false)
+  receiverDeleted Boolean   @default(false)
+
+  senderId String?
+  sender   Member? @relation("sender", fields: [senderId], references: [userId], onDelete: SetNull)
+
+  receiverId String?
+  receiver   Member? @relation("receiver", fields: [receiverId], references: [userId], onDelete: SetNull)
 }
 
 model Photo {

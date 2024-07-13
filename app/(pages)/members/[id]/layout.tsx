@@ -27,7 +27,7 @@ const Layout = async ({ params, children }: Props) => {
   const navLinks = [
     { name: "Profile", href: `${basePath}` },
     { name: "Photos", href: `${basePath}/photos` },
-    { name: "Chat", href: `${basePath}/chat` },
+    { name: "Chats", href: `${basePath}/chat` },
   ];
 
   return (
