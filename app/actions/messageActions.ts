@@ -1,7 +1,9 @@
 "use server";
 import { auth } from "@/config/auth";
 import prisma from "@/lib/prisma";
+import { pusherServer } from "@/lib/pusher";
 import { MessageSchema } from "@/lib/schema";
+import { createChatID } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -61,37 +63,30 @@ export const getChatMessages = async (receiverId: string) => {
       orderBy: {
         createdAt: "asc",
       },
-      select: {
-        id: true,
-        text: true,
-        createdAt: true,
-        dateRead: true,
-        sender: {
-          select: {
-            userId: true,
-            name: true,
-            image: true,
-          },
-        },
-        receiver: {
-          select: {
-            userId: true,
-            name: true,
-            image: true,
-          },
-        },
-      },
+      select: messageSelect,
     });
 
     if (messages) {
+      const readMessageIds = messages
+        .filter(
+          (message) =>
+            message.dateRead === null &&
+            message.receiver?.userId === user.id &&
+            message.sender?.userId === receiverId
+        )
+        .map((message) => message.id);
+
       revalidatePath(`/members/${receiverId}/chat`);
+
       await prisma.message.updateMany({
-        where: {
-          senderId: receiverId,
-          receiverId: user.id,
-        },
+        where: { id: { in: readMessageIds } },
         data: { dateRead: new Date() },
       });
+      await pusherServer.trigger(
+        createChatID(receiverId, user.id),
+        "messages:read",
+        readMessageIds
+      );
       return {
         success: true,
         data: messages,
@@ -125,26 +120,7 @@ export const getMessagesByContainer = async (container: string) => {
       orderBy: {
         createdAt: "desc",
       },
-      select: {
-        id: true,
-        text: true,
-        createdAt: true,
-        dateRead: true,
-        sender: {
-          select: {
-            userId: true,
-            name: true,
-            image: true,
-          },
-        },
-        receiver: {
-          select: {
-            userId: true,
-            name: true,
-            image: true,
-          },
-        },
-      },
+      select: messageSelect,
     });
 
     if (messages) {
@@ -160,7 +136,6 @@ export const getMessagesByContainer = async (container: string) => {
       error: "Unable to get messages, please try again later",
     };
   } catch (error) {
-    console.log(error);
     return {
       success: false,
       error: "Internal Server Error, getting messages",
@@ -191,10 +166,19 @@ export const createMessage = async (
         receiverId: receiverUserId,
         senderId: user.id,
       },
+      select: messageSelect,
     });
 
     if (message) {
       revalidatePath(`/members/${receiverUserId}/chat`);
+      revalidatePath("/messages");
+      //server side pusher config
+      //client need to subscribe to this channel
+      await pusherServer.trigger(
+        createChatID(user.id, receiverUserId),
+        "message:new",
+        message
+      );
       return {
         success: true,
         message: "Message created successfully",
@@ -207,10 +191,30 @@ export const createMessage = async (
       error: "Could not create message, please try later",
     };
   } catch (error: any) {
-    console.log("catching error ###########", error.message);
     return {
       success: false,
       error: error.message,
     };
   }
+};
+
+const messageSelect = {
+  id: true,
+  text: true,
+  createdAt: true,
+  dateRead: true,
+  sender: {
+    select: {
+      userId: true,
+      name: true,
+      image: true,
+    },
+  },
+  receiver: {
+    select: {
+      userId: true,
+      name: true,
+      image: true,
+    },
+  },
 };

@@ -29,8 +29,6 @@ export default async function MembersPage() {
       </h1>
     );
 
-  console.log("MembersPage", user);
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 w-fit">
       {members.map((member) => (

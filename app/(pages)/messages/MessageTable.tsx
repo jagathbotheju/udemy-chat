@@ -86,7 +86,7 @@ const MessageTable = ({ messages }: Props) => {
 
         case "text":
           return (
-            <div className="text-wrap text-justify line-clamp-2">
+            <div className="text-wrap text-justify line-clampde">
               {item.text}
             </div>
           );

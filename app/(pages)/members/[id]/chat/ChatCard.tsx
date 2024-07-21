@@ -1,5 +1,6 @@
 "use client";
 import { MessageExt } from "@/lib/types";
+import { timeAgo } from "@/lib/utils";
 import { Card, CardBody, CardFooter } from "@nextui-org/card";
 import { Avatar, cn, Divider } from "@nextui-org/react";
 import { User } from "@prisma/client";
@@ -34,28 +35,31 @@ const ChatCard = ({ message, currentUser }: Props) => {
                 {message.sender.name}
               </span>
               <span className="text-xs text-gray-500 ml-2">
-                {message.createdAt.toDateString()}
+                {message.dateRead && timeAgo(message.dateRead)}
               </span>
               <div className="flex self-end">
-                {message.dateRead && message.receiverId !== currentUser.id ? (
+                {/* {message.dateRead && message.receiverId !== currentUser.id ? (
                   <IoCheckmarkDoneSharp className="text-green-500" />
                 ) : (
                   <IoCheckmarkSharp className="text-green-500" />
+                )} */}
+                {message.dateRead && !isCurrentUserSender && (
+                  <IoCheckmarkDoneSharp className="text-green-500" />
                 )}
               </div>
             </div>
           </div>
-          <div ref={endRef}></div>
+          <div ref={endRef} />
         </CardFooter>
       </Card>
 
       <Avatar
         showFallback
-        src={message.sender.image as string}
         className={cn("absolute bottom-0 ", {
           "-left-8 -bottom-2": message.sender.userId === currentUser.id,
           "-right-8 -bottom-2": message.sender.userId !== currentUser.id,
         })}
+        src={message.sender.image as string}
       />
     </div>
   );

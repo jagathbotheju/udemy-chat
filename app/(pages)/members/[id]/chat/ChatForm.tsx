@@ -8,8 +8,6 @@ import { Button, Input } from "@nextui-org/react";
 import { HiPaperAirplane } from "react-icons/hi2";
 import { useParams, useRouter } from "next/navigation";
 import { createMessage } from "@/app/actions/messageActions";
-import { toast } from "sonner";
-import { MessageExt } from "@/lib/types";
 
 const ChatForm = () => {
   const params = useParams<{ id: string }>();
@@ -36,7 +34,6 @@ const ChatForm = () => {
   }, [setFocus]);
 
   const onSubmit = (formData: z.infer<typeof MessageSchema>) => {
-    console.log("ChatForm", formData);
     startTransition(() => {
       createMessage(params.id, formData)
         .then((res) => {
@@ -57,15 +54,15 @@ const ChatForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="w-full">
+    <form className="w-full py-5" onSubmit={handleSubmit(onSubmit)}>
       <div className="flex items-center gap-2">
         <Input
           fullWidth
           placeholder="Type a message"
           variant="faded"
           {...register("text")}
-          isInvalid={!!errors.text}
           errorMessage={errors.text?.message}
+          isInvalid={!!errors.text}
         />
 
         <Button

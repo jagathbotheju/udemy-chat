@@ -7,6 +7,7 @@ import _ from "lodash";
 import { MessageExt } from "@/lib/types";
 import ChatCards from "./ChatCards";
 import { getChatMessages } from "@/app/actions/messageActions";
+import { createChatID } from "@/lib/utils";
 
 interface Props {
   params: {
@@ -18,6 +19,7 @@ const ChatPage = async ({ params }: Props) => {
   const session = await auth();
   const user = session?.user;
   if (!user) redirect("/auth/login");
+  const chatID = createChatID(user.id, params.id);
 
   const response = await getChatMessages(params.id);
   const messages = response.data as MessageExt[];
@@ -35,11 +37,15 @@ const ChatPage = async ({ params }: Props) => {
           </>
         ) : (
           <>
-            <ChatCards messages={messages} currentUser={user} />
+            <ChatCards
+              currentUser={user}
+              initMessages={messages}
+              chatID={chatID}
+            />
           </>
         )}
       </CardBody>
-      <CardFooter>
+      <CardFooter className="pt-5 mt-5">
         <ChatForm />
       </CardFooter>
     </>
