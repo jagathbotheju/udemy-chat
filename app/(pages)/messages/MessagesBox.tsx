@@ -15,7 +15,7 @@ const MessagesBox = ({ messages }: Props) => {
         <MessagesSidebar />
       </div>
       <div className="col-span-10">
-        <MessageTable messages={messages} />
+        <MessageTable initMessages={messages} />{" "}
       </div>
     </div>
   );

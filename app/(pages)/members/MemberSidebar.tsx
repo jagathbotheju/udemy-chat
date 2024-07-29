@@ -1,4 +1,5 @@
 "use client";
+import PresenceIndicator from "@/components/PresenceIndicator";
 import { calculateAge } from "@/lib/utils";
 import {
   Button,
@@ -22,7 +23,7 @@ const MemberSidebar = ({ member, navLinks }: Props) => {
   const pathname = usePathname();
 
   return (
-    <Card className="w-full items-center h-[80vh]">
+    <Card className="w-full items-center h-[80vh] overflow-hidden">
       <Image
         height={200}
         width={200}
@@ -30,10 +31,11 @@ const MemberSidebar = ({ member, navLinks }: Props) => {
         alt="user profile main image"
         className="rounded-full mt-6 aspect-square object-cover"
       />
-      <CardBody>
-        <div className="flex flex-col items-center">
-          <div className="text-2xl">
+      <CardBody className="overflow-hidden">
+        <div className="flex flex-col items-center overflow-hidden">
+          <div className="text-2xl flex gap-1">
             {member.name}, {calculateAge(member.dateOfBirth)}
+            <PresenceIndicator member={member} />
           </div>
           <div className="text-sm text-neutral-500">
             {member.city}, {member.country}
@@ -54,7 +56,7 @@ const MemberSidebar = ({ member, navLinks }: Props) => {
           ))}
         </nav>
       </CardBody>
-      <CardFooter>
+      <CardFooter className="overflow-hidden">
         <Button
           as={Link}
           href="/members"

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { calculateAge } from "@/lib/utils";
 import LikeButton from "@/components/LikeButton";
 import React from "react";
+import PresenceIndicator from "@/components/PresenceIndicator";
 
 interface Props {
   member: Member;
@@ -21,17 +22,17 @@ const MemberCard = ({ member, likeIds }: Props) => {
 
   return (
     <Card
-      as={Link}
-      href={`/members/${member.userId}`}
       isPressable
+      as={Link}
       className="relative"
+      href={`/members/${member.userId}`}
     >
       <Image
         isZoomed
         alt={member.name}
-        width={300}
-        src={member.image || "/images/user.png"}
         className="aspect-square object-cover"
+        src={member.image || "/images/user.png"}
+        width={300}
       />
       <CardFooter className="flex justify-start bg-gradient-to-b from-transparent to-slate-800 overflow-hidden absolute bottom-0 z-10">
         <div className="flex flex-col text-white">
@@ -43,8 +44,15 @@ const MemberCard = ({ member, likeIds }: Props) => {
       </CardFooter>
 
       {/* like button */}
-      <div className="absolute top-2 right-2 z-50" onClick={preventPropagation}>
-        <LikeButton targetId={member.userId} hasLiked={hasLiked} />
+      <div
+        role="button"
+        className="absolute top-2 right-2 z-50"
+        onClick={preventPropagation}
+      >
+        <LikeButton hasLiked={hasLiked} targetId={member.userId} />
+      </div>
+      <div className="absolute top-1 left-1 z-50">
+        <PresenceIndicator member={member} />
       </div>
     </Card>
   );

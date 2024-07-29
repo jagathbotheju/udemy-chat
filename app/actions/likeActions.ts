@@ -1,7 +1,8 @@
 "use server";
 import { auth } from "@/config/auth";
 import prisma from "@/lib/prisma";
-import { Like } from "@prisma/client";
+import { pusherServer } from "@/lib/pusher";
+import { Like, Member } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 export const getLikedMembers = async (type = "source") => {
@@ -99,11 +100,10 @@ export const toggleLikeMember = async (
       };
     }
 
-    console.log("toggleLikeMember", userId);
-
-    let like = null;
+    let liked = null;
+    let unLiked = null;
     if (isLiked) {
-      like = await prisma.like.delete({
+      unLiked = await prisma.like.delete({
         where: {
           sourceUserId_targetUserId: {
             sourceUserId: userId,
@@ -112,17 +112,33 @@ export const toggleLikeMember = async (
         },
       });
     } else {
-      console.log("creating like****", userId, targetUserId);
-      like = await prisma.like.create({
+      liked = await prisma.like.create({
         data: {
           sourceUserId: userId,
           targetUserId,
         },
+        select: {
+          sourceMember: {
+            select: {
+              name: true,
+              image: true,
+              userId: true,
+            },
+          },
+        },
       });
     }
 
-    if (like) {
+    if (liked || unLiked) {
       revalidatePath("/members");
+
+      if (liked) {
+        await pusherServer.trigger(`private-${targetUserId}`, "like-new", {
+          name: liked.sourceMember.name,
+          image: liked.sourceMember.image,
+          userId: liked.sourceMember.userId,
+        });
+      }
       return {
         success: true,
         message: "Likes updated successfully",

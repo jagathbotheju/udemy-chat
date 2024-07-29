@@ -31,6 +31,11 @@ export const deleteMessage = async ({
         message: "Message deleted successfully",
       };
     }
+
+    return {
+      success: false,
+      error: "Could not delete message, please try again later",
+    };
   } catch (error) {
     console.log(error);
     return {
@@ -66,6 +71,8 @@ export const getChatMessages = async (receiverId: string) => {
       select: messageSelect,
     });
 
+    let redCount = 0;
+
     if (messages) {
       const readMessageIds = messages
         .filter(
@@ -76,6 +83,7 @@ export const getChatMessages = async (receiverId: string) => {
         )
         .map((message) => message.id);
 
+      redCount = readMessageIds.length;
       revalidatePath(`/members/${receiverId}/chat`);
 
       await prisma.message.updateMany({
@@ -89,7 +97,7 @@ export const getChatMessages = async (receiverId: string) => {
       );
       return {
         success: true,
-        data: messages,
+        data: { messages, redCount },
       };
     }
 
@@ -171,6 +179,7 @@ export const createMessage = async (
 
     if (message) {
       revalidatePath(`/members/${receiverUserId}/chat`);
+      revalidatePath(`/members/${message.sender?.userId}/chat`);
       revalidatePath("/messages");
       //server side pusher config
       //client need to subscribe to this channel
@@ -179,6 +188,12 @@ export const createMessage = async (
         "message:new",
         message
       );
+      await pusherServer.trigger(
+        `private-${receiverUserId}`,
+        "message:new",
+        message
+      );
+
       return {
         success: true,
         message: "Message created successfully",
@@ -194,6 +209,41 @@ export const createMessage = async (
     return {
       success: false,
       error: error.message,
+    };
+  }
+};
+
+/*******************GET UNREAD MESSAGE COUNT*********************** */
+export const getUnreadMessageCount = async () => {
+  try {
+    const session = await auth();
+    const user = session?.user;
+    if (!user) redirect("/auth/login");
+
+    const messageCount = await prisma.message.count({
+      where: {
+        receiverId: user.id,
+        dateRead: null,
+        receiverDeleted: false,
+      },
+    });
+
+    if (messageCount) {
+      return {
+        success: true,
+        data: messageCount,
+      };
+    }
+
+    return {
+      success: false,
+      error: "Unable to get unread message count, please try again later",
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      error: "Internal Server Error, getting unread message count",
     };
   }
 };

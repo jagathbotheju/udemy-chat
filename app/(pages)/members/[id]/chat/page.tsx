@@ -22,7 +22,8 @@ const ChatPage = async ({ params }: Props) => {
   const chatID = createChatID(user.id, params.id);
 
   const response = await getChatMessages(params.id);
-  const messages = response.data as MessageExt[];
+  const messages = response.data?.messages as MessageExt[];
+  const redCount = response.data?.redCount;
 
   return (
     <>
@@ -41,6 +42,7 @@ const ChatPage = async ({ params }: Props) => {
               currentUser={user}
               initMessages={messages}
               chatID={chatID}
+              redCount={redCount}
             />
           </>
         )}

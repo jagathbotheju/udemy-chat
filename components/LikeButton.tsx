@@ -30,12 +30,12 @@ const LikeButton = ({ targetId, hasLiked }: Props) => {
       onClick={toggleLike}
     >
       <AiOutlineHeart
-        size={28}
         className="fill-white absolute -top-[2px] -right-[2px]"
+        size={28}
       />
       <AiFillHeart
-        size={28}
         className={hasLiked ? "fill-rose-500" : "fill-neutral-500/70"}
+        size={28}
       />
     </div>
   );

@@ -1,4 +1,5 @@
 "use client";
+import { useMessageStore } from "@/store/useMessageStore";
 import { Chip, cn } from "@nextui-org/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
@@ -13,6 +14,7 @@ const MessagesSidebar = () => {
   const [selected, setSelected] = useState<string>(
     searchParams.get("container") || "inbox"
   );
+  const { unRedCount } = useMessageStore((state) => state);
 
   const items = [
     { key: "inbox", label: "Inbox", icon: GoInbox, chip: true },
@@ -40,7 +42,7 @@ const MessagesSidebar = () => {
           <Icon size={24} />
           <div className="flex justify-between flex-grow">
             <span>{label}</span>
-            {chip && <Chip>5</Chip>}
+            {chip && <Chip className="font-semibold">{unRedCount}</Chip>}
           </div>
         </div>
       ))}

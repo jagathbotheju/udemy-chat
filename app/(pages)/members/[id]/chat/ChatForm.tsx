@@ -66,12 +66,12 @@ const ChatForm = () => {
         />
 
         <Button
-          type="submit"
           isIconOnly
           color="secondary"
-          radius="full"
-          isLoading={isSubmitting}
           isDisabled={!isValid || isSubmitting || isPending}
+          isLoading={isSubmitting}
+          radius="full"
+          type="submit"
         >
           <HiPaperAirplane size={18} />
         </Button>

@@ -1,4 +1,5 @@
 "use client";
+import PresenceAvatar from "@/components/PresenceAvatar";
 import { MessageExt } from "@/lib/types";
 import { timeAgo } from "@/lib/utils";
 import { Card, CardBody, CardFooter } from "@nextui-org/card";
@@ -43,7 +44,7 @@ const ChatCard = ({ message, currentUser }: Props) => {
                 ) : (
                   <IoCheckmarkSharp className="text-green-500" />
                 )} */}
-                {message.dateRead && !isCurrentUserSender && (
+                {message.dateRead && isCurrentUserSender && (
                   <IoCheckmarkDoneSharp className="text-green-500" />
                 )}
               </div>
@@ -53,14 +54,18 @@ const ChatCard = ({ message, currentUser }: Props) => {
         </CardFooter>
       </Card>
 
-      <Avatar
-        showFallback
+      <div
         className={cn("absolute bottom-0 ", {
           "-left-8 -bottom-2": message.sender.userId === currentUser.id,
           "-right-8 -bottom-2": message.sender.userId !== currentUser.id,
         })}
-        src={message.sender.image as string}
-      />
+      >
+        {/* <Avatar showFallback src={message.sender.image as string} /> */}
+        <PresenceAvatar
+          src={message.sender.image as string}
+          userId={message.sender.userId}
+        />
+      </div>
     </div>
   );
 };
